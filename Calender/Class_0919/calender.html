@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Calender Like Dog</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            h1
+            {
+                font-size: 40px;
+                color: #ff3fc5;
+            }h2
+            {
+                font-size: 20px;
+                color: #fa6aff;
+            }
+        </style>
+    </head>
+    <body>
+        <script>
+            var route = "file:///D:/VR20222/HybridApp/Calender/Class_0919/owall";
+            var num = 0;
+            function PreImg() 
+            {
+                if(num <= 4) num--;
+                if(num <= 0) num = 0;
+                document.getElementById("owall").src = route + num.toString()+".jpg";
+                //const r = Math.floor(Math.random() * 5);
+            }
+            function NextImg() 
+            {
+                if(num >= 0) num++;
+                if(num >= 4) num = 4;
+                document.getElementById("owall").src = route + num.toString()+".jpg";
+            }
+        </script>
+        <div style="text-align : center;">
+            <h1>개 같은 달력</h1>
+
+            <h2 id="subtitle">우리집 오월이는 귀엽다</h2>
+
+            <img id = "owall" src = "owall0.jpg"
+            height="540">
+            <br><br>
+
+            <input type="button"
+            value="이전" 
+            onclick="PreImg()">
+
+            <input type="button"
+            value="다음" 
+            onclick="NextImg()">
+        </div>
+    </body>
+</html>
