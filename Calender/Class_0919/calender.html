@@ -19,19 +19,28 @@
         <script>
             var route = "file:///D:/VR20222/HybridApp/Calender/Class_0919/owall";
             var num = 0;
+            var max = 13;
             function PreImg() 
             {
-                if(num <= 4) num--;
+                if(num <= max) num--;
                 if(num <= 0) num = 0;
-                document.getElementById("owall").src = route + num.toString()+".jpg";
-                //const r = Math.floor(Math.random() * 5);
+                document.getElementById("owall").src = route + num.toString() + ".jpg";
             }
             function NextImg() 
             {
                 if(num >= 0) num++;
-                if(num >= 4) num = 4;
-                document.getElementById("owall").src = route + num.toString()+".jpg";
+                if(num >= max) num = max;
+                document.getElementById("owall").src = route + num.toString() + ".jpg";
             }
+            /*function RandomSuntitle()
+            {
+                const ran = Math.floor(Math.random() * 5);
+                if(ran == 0) document.getElementById("subtitle").innerText = "우리집 오월이는 귀엽다";
+                else if(ran == 1) document.getElementById("subtitle").innerText = "오월이는 아주 귀엽다";
+                else if(ran == 2) document.getElementById("subtitle").innerText = "꺅 너무 귀엽다";
+                else if(ran == 3) document.getElementById("subtitle").innerText = "우리집 오월이예요";
+                else if(ran == 4) document.getElementById("subtitle").innerText = "귀여운 오월이";
+            }*/
         </script>
         <div style="text-align : center;">
             <h1>개 같은 달력</h1>
