@@ -76,6 +76,11 @@ class DateComponent
 function CalenderTitle()
 {
     document.getElementById("title").innerText = year + "년 " + month + "월";
+    if(year <= 0) 
+    {
+        var bc = year * -1 + 1;
+        document.getElementById("title").innerText = "기원전" + bc + "년 " + month + "월";
+    }
 }
 
 //이전 달력
@@ -98,6 +103,16 @@ function NextCalender()
         month = 1;
         year++;
     }
+}
+
+function PreYearCalender()
+{
+    year--;
+}
+
+function NextYearCalender()
+{
+    year++;
 }
 
 function CalenderMaker()
@@ -144,6 +159,18 @@ function TodayWarp()
     year = nowCal.getFullYear();
     month = nowCal.getMonth() + 1;
 }
+
+/*function SelectYearWarp()
+{
+    var inputYear = document.getElementById("inputYear").value;
+    year = inputYear;
+}
+
+function SelectMonthWarp()
+{
+    var inputMonth = document.getElementById("inputMonth").value;
+    month = inputMonth;
+}*/
 
 CalenderTitle();
 CalenderMaker();

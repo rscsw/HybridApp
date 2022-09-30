@@ -105,9 +105,13 @@
                     <td id="cal[41]"></td>
                 </tr>
             </table>
-            <button class="btn" onclick="PreCalender(); CalenderMaker(); CalenderTitle();">이전</button>
-            <button class="btn" onclick="NextCalender(); CalenderMaker(); CalenderTitle();">다음</button><br>
-            <button class="btn" onclick="TodayWarp(); CalenderMaker(); CalenderTitle();">현재 달력으로 이동</button><br>
+            <button class="btn" onclick="PreYearCalender(); CalenderMaker(); CalenderTitle();"> << </button>
+            <button class="btn" onclick="PreCalender(); CalenderMaker(); CalenderTitle();"> < </button>
+            <button class="btn" onclick="NextCalender(); CalenderMaker(); CalenderTitle();"> > </button>
+            <button class="btn" onclick="NextYearCalender(); CalenderMaker(); CalenderTitle();"> >> </button><br>
+            <button class="btn" onclick="TodayWarp(); CalenderMaker(); CalenderTitle();">현재 달력으로 이동</button><br><br>
+            <!--<input type="number" id="inputYear" onchange="SelectYearWarp(); CalenderMaker(); CalenderTitle();">
+            <input type="number" id="inputMonth" min="1" max="12" onchange="SelectMonthWarp(); CalenderMaker(); CalenderTitle();">-->
         </div>
     </body>
     <script src="calender.js"></script>
