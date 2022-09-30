@@ -27,6 +27,22 @@
                 vertical-align: top;
                 font-size: 20px;
             }
+            button.btn
+            {
+                border: 1px solid #000000;
+                outline: none;
+                font-size: 20px;
+                margin: 10px;
+                background: #ffffff;
+                color: #000000;
+                padding: 5px;
+                cursor: pointer;
+            }
+            button.btn:hover
+            {
+                color: white;
+                background: black;
+            }
         </style>
     </head>
     <body>
@@ -89,8 +105,9 @@
                     <td id="cal[41]"></td>
                 </tr>
             </table>
-            <input type="button" value="이전" onclick="PreCalender(); CalenderMaker(); CalenderTitle();">
-            <input type="button" value="다음" onclick="NextCalender(); CalenderMaker(); CalenderTitle();">
+            <button class="btn" onclick="PreCalender(); CalenderMaker(); CalenderTitle();">이전</button>
+            <button class="btn" onclick="NextCalender(); CalenderMaker(); CalenderTitle();">다음</button><br>
+            <button class="btn" onclick="TodayWarp(); CalenderMaker(); CalenderTitle();">현재 달력으로 이동</button><br>
         </div>
     </body>
     <script src="calender.js"></script>

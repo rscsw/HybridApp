@@ -139,5 +139,11 @@ function CalenderMaker()
     }
 }
 
+function TodayWarp()
+{
+    year = nowCal.getFullYear();
+    month = nowCal.getMonth() + 1;
+}
+
 CalenderTitle();
 CalenderMaker();
