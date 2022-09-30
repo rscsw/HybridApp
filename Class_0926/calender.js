@@ -7,7 +7,6 @@ class DateComponent
 {
     constructor (date, day, comment) 
     {
-        console.log('construtor');
         this.date = date;
         this.day = day;
         this.comment = comment;
@@ -41,6 +40,11 @@ function NextCalender()
 
 function CalenderMaker()
 {
+    for(var i = 0; i < 42; i++)
+    {
+        document.getElementById("cal["+i+"]").innerText = "\u00a0";
+    }
+
     var firstdate = new Date(year, month -1 , 1);
     var lastdate = new Date(year, month, 0);
     var cm_day = 0;
@@ -50,8 +54,7 @@ function CalenderMaker()
     for(var i = firstdate.getDay(); i < lastdate.getDate() + firstdate.getDay(); i++)
     {
         dateComponent[cm_day] = new DateComponent(cm_day+1, cm_date, "");
-        //document.getElementById("cal["+i+"]").innerText = dateComponent[cm_day];
-        console.log(dateComponent[cm_day]);
+        document.getElementById("cal["+i+"]").innerText = dateComponent[cm_day].date;
         cm_day++;
         cm_date++;
         if(cm_date > 6) cm_date = 0;
