@@ -1,0 +1,16 @@
+/*.board {
+    width: 450px;
+    height: 450px;
+    background-color:rgb(235, 185, 255);
+    display:inline-block;
+    border-radius: 5%;
+  }
+
+  .numBox {
+    width: 100px;
+    height: 100px;
+    background-color:rgb(210, 97, 255);
+    display:inline-block;
+    margin: 5px;
+    border-radius: 10%;
+  }*/

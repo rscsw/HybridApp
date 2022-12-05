@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>I wanna go home</title>
+    </head>
+    <body>
+        <script src="https://unpkg.com/vue@3"></script>
+        <div id="app">
+            <button @click="count++">Get money</button>
+            <br>
+            You just earned {{count}} $
+        </div>
+        <div id="testapp">
+            <button @click="count+=10">Press this button if you're rich</button>
+            <br>
+            <p>You just trashed <b v-html="style">{{count}}</b> $</p>
+        </div>
+        <script type="module">
+            const {createApp} = Vue;
+            createApp({
+                data() {
+                    return {
+                        count : 0,
+                    }
+                },
+                mounted(){
+                    console.log("app mount success")
+                }
+            }).mount("#app")
+
+            createApp({
+                data() {
+                    return {
+                        style : "<span style='color: red'>1</span>"
+                    }
+                },
+                mounted(){
+                    console.log("testapp mount success")
+                }
+            }).mount("#testapp")
+        </script>
+    </body>
+</html>

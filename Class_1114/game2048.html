@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>2048</title>
+        <link href="style.css" rel="stylesheet">
+    </head>
+    <body>
+        <script src="https://unpkg.com/vue@3"></script>
+        <script src="script.js"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+            #app{
+                width : 300px;
+                height : 300px;
+                background-color :rgb(235, 185, 255);
+                justify-content : space-evenly;
+                align-content : space-evenly;
+                display: grid;
+                grid-template-columns : 1fr 1fr 1fr 1fr;
+                grid-template-rows : 1fr 1fr 1fr 1fr;
+                padding: 5px;
+                font-size: 30px;
+                font-family: 'Nanum Pen Script', cursive;
+            }
+            .numBox{
+                margin : 5px;
+                background-color :rgb(220, 131, 255);
+            }
+            .boxPrefab{
+                width : 50px;
+                height : 50px;
+                margin : 5px;
+                background-color :rgb(255, 196, 225);
+                position : absolute;
+                line-height : 50px;
+                left: 20px;
+                top: 20px;
+                color: rgb(255, 255, 255);
+            }
+        </style>
+        <div style="text-align : center;">
+            <div id="app">
+                <div class="numBox" v-for="index in numBoxes"></div>
+                <!-- <div class="boxPrefab">2048</div> -->
+            </div>
+        </div>
+
+        <script type="module">
+            const {createApp} = Vue;
+            createApp({
+                data() {
+                    return {
+                        numBoxes : 16,
+                    }
+                }
+            }).mount("#app")
+        </script>
+    </body>
+</html>
