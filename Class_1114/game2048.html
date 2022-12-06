@@ -37,12 +37,28 @@
                 top: 20px;
                 color: rgb(255, 255, 255);
             }
+            button.btn
+            {
+                border: 1px solid #000000;
+                outline: none;
+                font-size: 20px;
+                margin: 10px;
+                background: #ffffff;
+                color: #000000;
+                padding: 5px;
+                cursor: pointer;
+            }
+            button.btn:hover
+            {
+                color: white;
+                background: black;
+            }
         </style>
         <div style="text-align : center;">
             <div id="app">
                 <div class="numBox" v-for="index in numBoxes"></div>
-                <!-- <div class="boxPrefab">2048</div> -->
             </div>
+            <button class="btn" onclick="GameStart()">Game Start</button>
         </div>
 
         <script type="module">

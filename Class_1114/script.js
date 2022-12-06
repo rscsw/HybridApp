@@ -3,24 +3,39 @@ var map = [[0,0,0,0],
            [0,0,0,0],
            [0,0,0,0]];
 
+var gameStart = false;
+
 var boxLeft = [20, 95, 170, 245];
 var boxTop = [20, 95, 170, 245];
 
-var col2 = "#ffc8e1";
+var color2 = "rgb(255,200,225)";
+var color4 = "rgb(255,185,210)";
+var color8 = "rgb(255,170,195)";
+var color16 = "rgb(255,155,180)";
+var color32 = "rgb(255,140,165)";
+var color64 = "rgb(255,125,150)";
+var color128 = "rgb(255,110,135)";
+var color256 = "rgb(255,95,120)";
+var color512 = "rgb(255,80,105)";
+var color1024 = "rgb(255,65,90)";
+var color1048 = "rgb(255,50,75)";
 
 window.addEventListener("keydown", KeyDownEvent, false);
 
 var bpf = document.getElementsByClassName("boxPrefab");
 
 function KeyDownEvent(e) {
-	switch(e.key)
+	if(gameStart)
     {
-        case "ArrowLeft" : Left(); InitBlockMap(); break;
-        case "ArrowRight" : Right(); InitBlockMap(); break;
-        case "ArrowUp" : Up(); InitBlockMap(); break;
-        case "ArrowDown" : Down(); InitBlockMap(); break;
-        case "Enter" : Enter(); break;
-        default: ;
+        switch(e.key)
+        {
+            case "ArrowLeft" : Left(); Enter(); InitBlockMap(); GameOver(); break;
+            case "ArrowRight" : Right(); Enter(); InitBlockMap(); GameOver(); break;
+            case "ArrowUp" : Up(); Enter(); InitBlockMap(); GameOver(); break;
+            case "ArrowDown" : Down(); Enter(); InitBlockMap(); GameOver(); break;
+            //case "Enter" : Enter(); break;
+            default: ;
+        }
     }
 }
 
@@ -31,7 +46,7 @@ function Left()
         for(var ll = 1; ll < 4; ll++)
         {
             var next2 = false;
-            var next3 = false;
+            var next1 = false;
             if(ll == 1)
             {
                 if(map[tt][ll] == map[tt][ll-1])
@@ -52,7 +67,6 @@ function Left()
                 {
                     map[tt][ll-1] *= 2;
                     map[tt][ll] = 0;
-                    next2 = true;
                 }
                 else if(map[tt][ll-1] == 0)
                 {
@@ -81,7 +95,6 @@ function Left()
                 {
                     map[tt][ll-1] *= 2;
                     map[tt][ll] = 0;
-                    next2 = true;
                 }
                 else if(map[tt][ll-1] == 0)
                 {
@@ -95,16 +108,15 @@ function Left()
                     {
                         map[tt][ll-2] *= 2;
                         map[tt][ll-1] = 0;
-                        next3 = true;
                     }
                     else if(map[tt][ll-2] == 0)
                     {
                         map[tt][ll-2] = map[tt][ll-1];
                         map[tt][ll-1] = 0;
-                        next3 = true;
+                        next1 = true;
                     }
                 }
-                if(next3)
+                if(next1)
                 {
                     if(map[tt][ll-2] == map[tt][ll-3])
                     {
@@ -151,7 +163,6 @@ function Right()
                 {
                     map[tt][ll+1] *= 2;
                     map[tt][ll] = 0;
-                    next1 = true;
                 }
                 else if(map[tt][ll+1] == 0)
                 {
@@ -180,7 +191,6 @@ function Right()
                 {
                     map[tt][ll+1] *= 2;
                     map[tt][ll] = 0;
-                    next1 = true;
                 }
                 else if(map[tt][ll+1] == 0)
                 {
@@ -194,7 +204,6 @@ function Right()
                     {
                         map[tt][ll+2] *= 2;
                         map[tt][ll+1] = 0;
-                        next0 = true;
                     }
                     else if(map[tt][ll+2] == 0)
                     {
@@ -250,7 +259,6 @@ function Up()
                 {
                     map[tt-1][ll] *= 2;
                     map[tt][ll] = 0;
-                    next2 = true;
                 }
                 else if(map[tt-1][ll] == 0)
                 {
@@ -279,7 +287,6 @@ function Up()
                 {
                     map[tt-1][ll] *= 2;
                     map[tt][ll] = 0;
-                    next2 = true;
                 }
                 else if(map[tt-1][ll] == 0)
                 {
@@ -293,7 +300,6 @@ function Up()
                     {
                         map[tt-2][ll] *= 2;
                         map[tt-1][ll] = 0;
-                        next3 = true;
                     }
                     else if(map[tt-2][ll] == 0)
                     {
@@ -349,7 +355,6 @@ function Down()
                 {
                     map[tt+1][ll] *= 2;
                     map[tt][ll] = 0;
-                    next1 = true;
                 }
                 else if(map[tt+1][ll] == 0)
                 {
@@ -378,7 +383,6 @@ function Down()
                 {
                     map[tt+1][ll] *= 2;
                     map[tt][ll] = 0;
-                    next1 = true;
                 }
                 else if(map[tt+1][ll] == 0)
                 {
@@ -392,7 +396,6 @@ function Down()
                     {
                         map[tt+2][ll] *= 2;
                         map[tt+1][ll] = 0;
-                        next0 = true;
                     }
                     else if(map[tt+2][ll] == 0)
                     {
@@ -463,9 +466,13 @@ function NewBoxPrefab()
     }
     bpf[bpf.length - 1].style.left = boxLeft[ll]+"px";
     bpf[bpf.length - 1].style.top = boxTop[tt]+"px";
-    bpf[bpf.length - 1].style.backgroundColor = col2;
-    bpf[bpf.length - 1].innerHTML = 2;
-    map[tt][ll] = 2;
+    var rr = Math.floor(Math.random() * 10);
+    if(rr <= 0) rr = 4;
+    else rr = 2;
+    bpf[bpf.length - 1].innerHTML = rr;
+    var vv = window["color"+rr];
+    bpf[bpf.length - 1].style.backgroundColor = vv;
+    map[tt][ll] = rr;
 }
 
 function InitBlockMap()
@@ -491,6 +498,93 @@ function DrawBlockMap(num, tt, ll)
     currentDiv.appendChild(bp);
     bpf[bpf.length - 1].style.left = boxLeft[ll]+"px";
     bpf[bpf.length - 1].style.top = boxTop[tt]+"px";
-    bpf[bpf.length - 1].style.backgroundColor = col2; //색깔 유동적으로 변경할 수 있도록 생각해보기
+    var vv = window["color"+num];
+    bpf[bpf.length - 1].style.backgroundColor = vv;
     bpf[bpf.length - 1].innerHTML = num;
+} 
+
+function GameStart()
+{
+    var fin = false;
+    var bp = makeHtmlElement("div", {class: "boxPrefab"});
+    var currentDiv = document.getElementById("app");
+    currentDiv.appendChild(bp);
+    var tt;
+    var ll;
+    while(!fin)
+    {
+        tt = Math.floor(Math.random() * 4);
+        ll = Math.floor(Math.random() * 4);
+        if(map[tt][ll] == 0) fin = true;
+    }
+    bpf[bpf.length - 1].style.left = boxLeft[ll]+"px";
+    bpf[bpf.length - 1].style.top = boxTop[tt]+"px";
+    var rr = Math.floor(Math.random() * 10);
+    if(rr <= 0) rr = 4;
+    else rr = 2;
+    bpf[bpf.length - 1].innerHTML = rr;
+    var vv = window["color"+rr];
+    bpf[bpf.length - 1].style.backgroundColor = vv;
+    map[tt][ll] = rr;
+    Enter();
+
+    document.getElementsByClassName("btn")[0].remove();
+    gameStart = true;
+}
+
+function GameOver()
+{
+    var over = 0;
+    for(var tt = 0; tt < 4; tt++)
+    {
+        for(var ll = 0; ll < 4; ll++)
+        {
+            if(map[tt][ll] == 0) break;
+            try{
+                if(map[tt][ll] != map[tt-1][ll])
+                {
+                    over++;
+                }
+            }
+            catch(e)
+            {
+                ;
+            }
+            try{
+                if(map[tt][ll] != map[tt+1][ll])
+                {
+                    over++;
+                }
+            }
+            catch(e)
+            {
+                ;
+            }
+            try{
+                if(map[tt][ll] != map[tt][ll-1])
+                {
+                    over++;
+                }
+            }
+            catch(e)
+            {
+                ;
+            }
+            try{
+                if(map[tt][ll] != map[tt][ll+1])
+                {
+                    over++;
+                }
+            }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+            catch(e)
+            {
+                ;
+            }
+        }
+    }
+    if(over >= 56)
+    {
+        console.log("game over");
+        alert("game over");
+    }
 }
