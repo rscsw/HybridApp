@@ -28,23 +28,103 @@ function makeHtmlElement(tagName, ...attr) {
     return element;
 };
 
+var currentN = 0;
+
+var bpfPool = new Array();
+for(let i = 0; i < 16; i++)
+{
+    let bpf = makeHtmlElement("div", {class:"boxPrefab"});
+    bpfPool.push(bpf);
+}
+
+var NbpfPool = new Array();
+
 class BlockMap
 {
-    constructor(holdingNum)
+    constructor(holdingNum, myLeft, myTop, myBox)
     {
         this.holdingNum = holdingNum;
+        this.myLeft = myLeft;
+        this.myTop = myTop;
+        this.myBox = myBox;
     }
     NewBoxPrefab()
     {
-
+        let fin = false;
+        let tt;
+        let ll;
+        while(!fin)
+        {
+            tt = Math.floor(Math.random() * 4);
+            ll = Math.floor(Math.random() * 4);
+            if(this.holdingNum == 0) fin = true;
+        }
+        let bb = bpfPool.pop();
+        this.myLeft = ll;
+        bb.style.left = boxLeft[this.myLeft]+"px";
+        this.myTop = tt;
+        bb.style.top = boxTop[this.myTop]+"px";
+        bb.innerHTML = 2;
+        bb.style.backgroundColor = color2;
+        this.holdingNum = 2;
+        let cd = document.getElementById("app");
+        cd.appendChild(bb);
+        NbpfPool.push(bb);
     }
-    Animation()
+    Animation(me, mypos, imovehere, position)
     {
-
+        let mp = mypos;
+        if(position == "Left")
+        {
+            let ii = setInterval(function(){
+                mp -= 5;
+                me.style.left = mp+"px";
+                if(mp == imovehere)
+                {
+                    clearInterval(ii);
+                }
+            }, 25);
+        }
+        else if(position == "Right")
+        {
+            let ii = setInterval(function(){
+                mp += 5;
+                me.style.left = mp+"px";
+                if(mp == imovehere) clearInterval(ii);
+            }, 25);
+        }
+        else if(position == "Up")
+        {
+            let ii = setInterval(function(){
+                mp -= 5;
+                me.style.top = mp+"px";
+                if(mp == imovehere) clearInterval(ii);
+            }, 25);
+        }
+        else if(position == "Down")
+        {
+            let ii = setInterval(function(){
+                mp += 5;
+                me.style.top = mp+"px";
+                if(mp == imovehere) clearInterval(ii);
+            }, 25);
+        }
     }
     InitBlockMap()
     {
-
+        if(this.holdingNum != 0)
+        {
+            currentN = 0;
+            bpfPool.push(NbpfPool.pop());
+            let bb = bpfPool.pop();
+            bb.style.left = boxLeft[this.myLeft]+"px";
+            bb.style.top = boxTop[this.myTop]+"px";
+            bb.innerHTML = this.holdingNum;
+            let vv = window["color"+this.holdingNum];
+            bb.style.backgroundColor = vv;
+            let cd = document.getElementById("app");
+            cd.appendChild(bb);
+        }
     }
 }
 
@@ -54,13 +134,6 @@ for(let i = 0; i < 16; i++)
     map[i] = new BlockMap(0);
 }
 
-var bpfPool = new Array();
-for(let i = 0; i < 16; i++)
-{
-    var bpf = makeHtmlElement("div", {class:"boxPrefab"});
-    bpfPool.push(bpf);
-}
-
 window.addEventListener("keydown", KeyDownEvent, false);
 
 function KeyDownEvent(e) {
@@ -68,10 +141,10 @@ function KeyDownEvent(e) {
     {
         switch(e.key)
         {
-            case "ArrowLeft" : break;
-            case "ArrowRight" : break;
-            case "ArrowUp" : break;
-            case "ArrowDown" : break;
+            case "ArrowLeft" : Left(); break;
+            case "ArrowRight" : ; break;
+            case "ArrowUp" : ; break;
+            case "ArrowDown" : Imsi(); break;
             default: ;
         }
     }
@@ -82,24 +155,51 @@ function GameStart()
     let fin = false;
     let tt;
     let ll;
+    let mm;
     while(!fin)
     {
         tt = Math.floor(Math.random() * 4);
         ll = Math.floor(Math.random() * 4);
-        if(map[tt*4+ll].holdingNum == 0) fin = true;
+        mm = tt * 4 + ll;
+        fin = true;
     }
     let bb = bpfPool.pop();
-    bb.style.left = boxLeft[ll]+"px";
-    bb.style.top = boxTop[tt]+"px";
+    map[mm].myLeft = ll;
+    bb.style.left = boxLeft[map[mm].myLeft]+"px";
+    map[mm].myTop = tt;
+    bb.style.top = boxTop[map[mm].myTop]+"px";
     let rr = Math.floor(Math.random() * 10);
     if(rr <= 0) rr = 4;
     else rr = 2;
     bb.innerHTML = rr;
     let vv = window["color"+rr];
     bb.style.backgroundColor = vv;
-    map[tt*4+ll].holdingNum = rr;
+    map[mm].holdingNum = rr;
     let cd = document.getElementById("app");
     cd.appendChild(bb);
+    NbpfPool.push(bb);
+    map[mm].myBox = NbpfPool[currentN];
+    currentN++;
+
+    fin = false;
+    while(!fin)
+    {
+        tt = Math.floor(Math.random() * 4);
+        ll = Math.floor(Math.random() * 4);
+        mm = tt * 4 + ll;
+        if(map[mm].holdingNum == 0) fin = true;
+    }
+    let bbb = bpfPool.pop();
+    map[mm].myLeft = ll;
+    bbb.style.left = boxLeft[map[mm].myLeft]+"px";
+    map[mm].myTop = tt;
+    bbb.style.top = boxTop[map[mm].myTop]+"px";
+    bbb.innerHTML = 2;
+    bbb.style.backgroundColor = color2;
+    map[mm].holdingNum = 2;
+    cd.appendChild(bbb);
+    NbpfPool.push(bbb);
+    map[mm].myBox = NbpfPool[currentN];
 
     document.getElementById("title").remove();
     gameRun = true;
@@ -107,5 +207,145 @@ function GameStart()
 
 function Left()
 {
-    
+    for(let tt = 0; tt < 4; tt++)
+    {
+        for(let ll = 1; ll < 4; ll++)
+        {
+            let mm = tt * 4 + ll;
+            if(ll == 1 && map[mm].holdingNum != 0)
+            {
+                if(map[mm].holdingNum == map[mm-1].holdingNum)
+                {
+                    map[mm-1].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-1], "Left");
+                    map[mm-1].myLeft = map[mm].myLeft-1;
+                    map[mm-1].myTop = map[mm].myTop;
+                }
+                else if(map[mm-1].holdingNum == 0)
+                {
+                    map[mm-1].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-1], "Left");
+                    map[mm-1].myLeft = map[mm].myLeft-1;
+                    map[mm-1].myTop = map[mm].myTop;
+                }
+            }
+            else if(ll == 2 && map[mm] != 0)
+            {
+                let next1 = false;
+                if(map[mm].holdingNum == map[mm-1].holdingNum)
+                {
+                    map[mm-1].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-1], "Left");
+                    map[mm-1].myLeft = map[mm].myLeft-1;
+                    map[mm-1].myTop = map[mm].myTop;
+                }
+                else if(map[mm-1].holdingNum == 0)
+                {
+                    map[mm-1].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-1], "Left");
+                    map[mm-1].myLeft = map[mm].myLeft-1;
+                    map[mm-1].myTop = map[mm].myTop;
+                    next1 = true;
+                }
+                if(next1)
+                {
+                    if(map[mm-1].holdingNum == map[mm-2].holdingNum)
+                    {
+                        map[mm-2].holdingNum *= 2;
+                        map[mm-1].holdingNum = 0;
+                        map[mm-1].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-2], "Left");
+                        map[mm-2].myLeft = map[mm-1].myLeft-1;
+                        map[mm-2].myTop = map[mm-1].myTop;
+                    }
+                    else if(map[mm-2].holdingNum == 0)
+                    {
+                        map[mm-2].holdingNum = map[mm-1].holdingNum;
+                        map[mm-1].holdingNum = 0;
+                        map[mm-1].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-2], "Left");
+                        map[mm-2].myLeft = map[mm-1].myLeft-1;
+                        map[mm-2].myTop = map[mm-1].myTop;
+                    }
+                }
+            }
+            else if(ll == 3 && map[mm] != 0)
+            {
+                let next1 = false;
+                let next0 = false;
+                if(map[mm].holdingNum == map[mm-1].holdingNum)
+                {
+                    map[mm-1].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-1], "Left");
+                    map[mm-1].myLeft = map[mm].myLeft-1;
+                    map[mm-1].myTop = map[mm].myTop;
+                }
+                else if(map[mm-1].holdingNum == 0)
+                {
+                    map[mm-1].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-1], "Left");
+                    map[mm-1].myLeft = map[mm].myLeft-1;
+                    map[mm-1].myTop = map[mm].myTop;
+                    next1 = true;
+                }
+                if(next1)
+                {
+                    if(map[mm-1].holdingNum == map[mm-2].holdingNum)
+                    {
+                        map[mm-2].holdingNum *= 2;
+                        map[mm-1].holdingNum = 0;
+                        map[mm-1].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-2], "Left");
+                        map[mm-2].myLeft = map[mm-1].myLeft-1;
+                        map[mm-2].myTop = map[mm-1].myTop;
+                    }
+                    else if(map[mm-2].holdingNum == 0)
+                    {
+                        map[mm-2].holdingNum = map[mm-1].holdingNum;
+                        map[mm-1].holdingNum = 0;
+                        map[mm-1].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-2], "Left");
+                        map[mm-2].myLeft = map[mm-1].myLeft-1;
+                        map[mm-2].myTop = map[mm-1].myTop;
+                        next0 - true;
+                    }
+                }
+                if(next0)
+                {
+                    if(map[mm-2].holdingNum == map[mm-3].holdingNum)
+                    {
+                        map[mm-3].holdingNum *= 2;
+                        map[mm-2].holdingNum = 0;
+                        map[mm-2].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-3], "Left");
+                        map[mm-3].myLeft = map[mm-2].myLeft-2;
+                        map[mm-3].myTop = map[mm-2].myTop;
+                    }
+                    else if(map[mm-3].holdingNum == 0)
+                    {
+                        map[mm-3].holdingNum = map[mm-2].holdingNum;
+                        map[mm-2].holdingNum = 0;
+                        map[mm-2].Animation(map[mm].myBox, boxLeft[map[mm].myLeft], boxLeft[map[mm].myLeft-3], "Left");
+                        map[mm-3].myLeft = map[mm-2].myLeft-2;
+                        map[mm-3].myTop = map[mm-2].myTop;
+                    }
+                }
+            }
+        }
+    }
+}
+
+function Right()
+{
+        
+}
+
+function Imsi()
+{
+    for(let i = 0; i < 16; i++)
+    {
+        map[i].InitBlockMap();
+        console.log("fuck");
+    }
 }
