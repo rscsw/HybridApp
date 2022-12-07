@@ -1,9 +1,4 @@
-var map = [[0,0,0,0],
-           [0,0,0,0],
-           [0,0,0,0],
-           [0,0,0,0]];
-
-var gameStart = false;
+var gameRun = false;
 
 var boxLeft = [20, 95, 170, 245];
 var boxTop = [20, 95, 170, 245];
@@ -18,412 +13,9 @@ var color128 = "rgb(255,110,135)";
 var color256 = "rgb(255,95,120)";
 var color512 = "rgb(255,80,105)";
 var color1024 = "rgb(255,65,90)";
-var color1048 = "rgb(255,50,75)";
+var color2048 = "rgb(255,50,75)";
 
-window.addEventListener("keydown", KeyDownEvent, false);
-
-var bpf = document.getElementsByClassName("boxPrefab");
-
-function KeyDownEvent(e) {
-	if(gameStart)
-    {
-        switch(e.key)
-        {
-            case "ArrowLeft" : Left(); Enter(); InitBlockMap(); GameOver(); break;
-            case "ArrowRight" : Right(); Enter(); InitBlockMap(); GameOver(); break;
-            case "ArrowUp" : Up(); Enter(); InitBlockMap(); GameOver(); break;
-            case "ArrowDown" : Down(); Enter(); InitBlockMap(); GameOver(); break;
-            //case "Enter" : Enter(); break;
-            default: ;
-        }
-    }
-}
-
-function Left()
-{
-    for(var tt = 0; tt < 4; tt++)
-    {
-        for(var ll = 1; ll < 4; ll++)
-        {
-            var next2 = false;
-            var next1 = false;
-            if(ll == 1)
-            {
-                if(map[tt][ll] == map[tt][ll-1])
-                {
-                    map[tt][ll-1] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt][ll-1] == 0)
-                {
-                    map[tt][ll-1] = map[tt][ll];
-                    map[tt][ll] = 0;
-                }
-            }
-            //----------------------------------------------------
-            else if(ll == 2)
-            {
-                if(map[tt][ll] == map[tt][ll-1])
-                {
-                    map[tt][ll-1] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt][ll-1] == 0)
-                {
-                    map[tt][ll-1] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next2 = true;
-                }
-                if(next2)
-                {
-                    if(map[tt][ll-1] == map[tt][ll-2])
-                    {
-                        map[tt][ll-2] *= 2;
-                        map[tt][ll-1] = 0;
-                    }
-                    else if(map[tt][ll-2] == 0)
-                    {
-                        map[tt][ll-2] = map[tt][ll-1];
-                        map[tt][ll-1] = 0;
-                    }
-                }
-            }
-            //----------------------------------------------------
-            else if(ll == 3)
-            {
-                if(map[tt][ll] == map[tt][ll-1])
-                {
-                    map[tt][ll-1] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt][ll-1] == 0)
-                {
-                    map[tt][ll-1] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next2 = true;
-                }
-                if(next2)
-                {
-                    if(map[tt][ll-1] == map[tt][ll-2])
-                    {
-                        map[tt][ll-2] *= 2;
-                        map[tt][ll-1] = 0;
-                    }
-                    else if(map[tt][ll-2] == 0)
-                    {
-                        map[tt][ll-2] = map[tt][ll-1];
-                        map[tt][ll-1] = 0;
-                        next1 = true;
-                    }
-                }
-                if(next1)
-                {
-                    if(map[tt][ll-2] == map[tt][ll-3])
-                    {
-                        map[tt][ll-3] *= 2;
-                        map[tt][ll-2] = 0;
-                    }
-                    else if(map[tt][ll-3] == 0)
-                    {
-                        map[tt][ll-3] = map[tt][ll-2];
-                        map[tt][ll-2] = 0;
-                    }
-                }
-            }
-        }
-    }
-    InitBlockMap();
-}
-
-function Right()
-{
-    for(var tt = 0; tt < 4; tt++)
-    {
-        for(var ll = 2; ll >= 0; ll--)
-        {
-            var next1 = false;
-            var next0 = false;
-            if(ll == 2)
-            {
-                if(map[tt][ll] == map[tt][ll+1])
-                {
-                    map[tt][ll+1] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt][ll+1] == 0)
-                {
-                    map[tt][ll+1] = map[tt][ll];
-                    map[tt][ll] = 0;
-                }
-            }
-            //----------------------------------------------------
-            else if(ll == 1)
-            {
-                if(map[tt][ll] == map[tt][ll+1])
-                {
-                    map[tt][ll+1] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt][ll+1] == 0)
-                {
-                    map[tt][ll+1] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next1 = true;
-                }
-                if(next1)
-                {
-                    if(map[tt][ll+1] == map[tt][ll+2])
-                    {
-                        map[tt][ll+2] *= 2;
-                        map[tt][ll+1] = 0;
-                    }
-                    else if(map[tt][ll+2] == 0)
-                    {
-                        map[tt][ll+2] = map[tt][ll+1];
-                        map[tt][ll+1] = 0;
-                    }
-                }
-            }
-            //----------------------------------------------------
-            else if(ll == 0)
-            {
-                if(map[tt][ll] == map[tt][ll+1])
-                {
-                    map[tt][ll+1] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt][ll+1] == 0)
-                {
-                    map[tt][ll+1] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next1 = true;
-                }
-                if(next1)
-                {
-                    if(map[tt][ll+1] == map[tt][ll+2])
-                    {
-                        map[tt][ll+2] *= 2;
-                        map[tt][ll+1] = 0;
-                    }
-                    else if(map[tt][ll+2] == 0)
-                    {
-                        map[tt][ll+2] = map[tt][ll+1];
-                        map[tt][ll+1] = 0;
-                        next0 = true;
-                    }
-                }
-                if(next0)
-                {
-                    if(map[tt][ll+2] == map[tt][ll+3])
-                    {
-                        map[tt][ll+3] *= 2;
-                        map[tt][ll+2] = 0;
-                    }
-                    else if(map[tt][ll+3] == 0)
-                    {
-                        map[tt][ll+3] = map[tt][ll+2];
-                        map[tt][ll+2] = 0;
-                    }
-                }
-            }
-        }
-    }
-    InitBlockMap();
-}
-
-function Up()
-{
-    for(var ll = 0; ll < 4; ll++)
-    {
-        for(var tt = 1; tt < 4; tt++)
-        {
-            var next2 = false;
-            var next3 = false;
-            if(tt == 1)
-            {
-                if(map[tt][ll] == map[tt-1][ll])
-                {
-                    map[tt-1][ll] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt-1][ll] == 0)
-                {
-                    map[tt-1][ll] = map[tt][ll];
-                    map[tt][ll] = 0;
-                }
-            }
-            //----------------------------------------------------
-            else if(tt == 2)
-            {
-                if(map[tt][ll] == map[tt-1][ll])
-                {
-                    map[tt-1][ll] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt-1][ll] == 0)
-                {
-                    map[tt-1][ll] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next2 = true;
-                }
-                if(next2)
-                {
-                    if(map[tt-1][ll] == map[tt-2][ll])
-                    {
-                        map[tt-2][ll] *= 2;
-                        map[tt-1][ll] = 0;
-                    }
-                    else if(map[tt-2][ll] == 0)
-                    {
-                        map[tt-2][ll] = map[tt-1][ll];
-                        map[tt-1][ll] = 0;
-                    }
-                }
-            }
-            //----------------------------------------------------
-            else if(tt == 3)
-            {
-                if(map[tt][ll] == map[tt-1][ll])
-                {
-                    map[tt-1][ll] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt-1][ll] == 0)
-                {
-                    map[tt-1][ll] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next2 = true;
-                }
-                if(next2)
-                {
-                    if(map[tt-1][ll] == map[tt-2][ll])
-                    {
-                        map[tt-2][ll] *= 2;
-                        map[tt-1][ll] = 0;
-                    }
-                    else if(map[tt-2][ll] == 0)
-                    {
-                        map[tt-2][ll] = map[tt-1][ll];
-                        map[tt-1][ll] = 0;
-                        next3 = true;
-                    }
-                }
-                if(next3)
-                {
-                    if(map[tt-2][ll] == map[tt-3][ll])
-                    {
-                        map[tt-3][ll] *= 2;
-                        map[tt-2][ll] = 0;
-                    }
-                    else if(map[tt-3][ll] == 0)
-                    {
-                        map[tt-3][ll] = map[tt-2][ll];
-                        map[tt-2][ll] = 0;
-                    }
-                }
-            }
-        }
-    }
-    InitBlockMap();
-}
-
-function Down()
-{
-    for(var ll = 0; ll < 4; ll++)
-    {
-        for(var tt = 2; tt >= 0; tt--)
-        {
-            var next1 = false;
-            var next0 = false;
-            if(tt == 2)
-            {
-                if(map[tt][ll] == map[tt+1][ll])
-                {
-                    map[tt+1][ll] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt+1][ll] == 0)
-                {
-                    map[tt+1][ll] = map[tt][ll];
-                    map[tt][ll] = 0;
-                }
-            }
-            //----------------------------------------------------
-            else if(tt == 1)
-            {
-                if(map[tt][ll] == map[tt+1][ll])
-                {
-                    map[tt+1][ll] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt+1][ll] == 0)
-                {
-                    map[tt+1][ll] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next1 = true;
-                }
-                if(next1)
-                {
-                    if(map[tt+1][ll] == map[tt+2][ll])
-                    {
-                        map[tt+2][ll] *= 2;
-                        map[tt+1][ll] = 0;
-                    }
-                    else if(map[tt+2][ll] == 0)
-                    {
-                        map[tt+2][ll] = map[tt+1][ll];
-                        map[tt+1][ll] = 0;
-                    }
-                }
-            }
-            //----------------------------------------------------
-            else if(tt == 0)
-            {
-                if(map[tt][ll] == map[tt+1][ll])
-                {
-                    map[tt+1][ll] *= 2;
-                    map[tt][ll] = 0;
-                }
-                else if(map[tt+1][ll] == 0)
-                {
-                    map[tt+1][ll] = map[tt][ll];
-                    map[tt][ll] = 0;
-                    next1 = true;
-                }
-                if(next1)
-                {
-                    if(map[tt+1][ll] == map[tt+2][ll])
-                    {
-                        map[tt+2][ll] *= 2;
-                        map[tt+1][ll] = 0;
-                    }
-                    else if(map[tt+2][ll] == 0)
-                    {
-                        map[tt+2][ll] = map[tt+1][ll];
-                        map[tt+1][ll] = 0;
-                        next0 = true;
-                    }
-                }
-                if(next0)
-                {
-                    if(map[tt+2][ll] == map[tt+3][ll])
-                    {
-                        map[tt+3][ll] *= 2;
-                        map[tt+2][ll] = 0;
-                    }
-                    else if(map[tt+3][ll] == 0)
-                    {
-                        map[tt+3][ll] = map[tt+2][ll];
-                        map[tt+2][ll] = 0;
-                    }
-                }
-            }
-        }
-    }
-    InitBlockMap();
-}
-
-const makeHtmlElement = function (tagName, ...attr) {
+function makeHtmlElement(tagName, ...attr) {
     const element = document.createElement(tagName);
     for (let prop of attr) {
         const [key, value] = Object.entries(prop)[0];
@@ -436,155 +28,84 @@ const makeHtmlElement = function (tagName, ...attr) {
     return element;
 };
 
-function Enter()
+class BlockMap
 {
-    var count = 0;
-    for(var i = 0; i < 4; i++)
+    constructor(holdingNum)
     {
-        for(var j = 0; j < 4; j++)
-        {
-            if(map[i][j] != 0) count++;
-        }
+        this.holdingNum = holdingNum;
     }
-    if(count < 16) NewBoxPrefab();
-    else console.log("no more box in the area");
+    NewBoxPrefab()
+    {
+
+    }
+    Animation()
+    {
+
+    }
+    InitBlockMap()
+    {
+
+    }
 }
 
-function NewBoxPrefab()
+var map = new Array();
+for(let i = 0; i < 16; i++)
 {
-    var fin = false;
-    var bp = makeHtmlElement("div", {class: "boxPrefab"});
-    var currentDiv = document.getElementById("app");
-    currentDiv.appendChild(bp);
-    var tt;
-    var ll;
-    while(!fin)
-    {
-        tt = Math.floor(Math.random() * 4);
-        ll = Math.floor(Math.random() * 4);
-        if(map[tt][ll] == 0) fin = true;
-    }
-    bpf[bpf.length - 1].style.left = boxLeft[ll]+"px";
-    bpf[bpf.length - 1].style.top = boxTop[tt]+"px";
-    var rr = Math.floor(Math.random() * 10);
-    if(rr <= 0) rr = 4;
-    else rr = 2;
-    bpf[bpf.length - 1].innerHTML = rr;
-    var vv = window["color"+rr];
-    bpf[bpf.length - 1].style.backgroundColor = vv;
-    map[tt][ll] = rr;
+    map[i] = new BlockMap(0);
 }
 
-function InitBlockMap()
+var bpfPool = new Array();
+for(let i = 0; i < 16; i++)
 {
-    for(var i = 0; i < bpf.length; i++)
-    {
-        bpf[i].remove();
-    }
+    var bpf = makeHtmlElement("div", {class:"boxPrefab"});
+    bpfPool.push(bpf);
+}
 
-    for(var tt = 0; tt < 4; tt++)
+window.addEventListener("keydown", KeyDownEvent, false);
+
+function KeyDownEvent(e) {
+	if(gameRun)
     {
-        for(var ll = 0; ll < 4; ll++)
+        switch(e.key)
         {
-            if(map[tt][ll] != 0) DrawBlockMap(map[tt][ll], tt, ll);
+            case "ArrowLeft" : break;
+            case "ArrowRight" : break;
+            case "ArrowUp" : break;
+            case "ArrowDown" : break;
+            default: ;
         }
     }
 }
-
-function DrawBlockMap(num, tt, ll)
-{
-    var bp = makeHtmlElement("div", {class: "boxPrefab"});
-    var currentDiv = document.getElementById("app");
-    currentDiv.appendChild(bp);
-    bpf[bpf.length - 1].style.left = boxLeft[ll]+"px";
-    bpf[bpf.length - 1].style.top = boxTop[tt]+"px";
-    var vv = window["color"+num];
-    bpf[bpf.length - 1].style.backgroundColor = vv;
-    bpf[bpf.length - 1].innerHTML = num;
-} 
 
 function GameStart()
 {
-    var fin = false;
-    var bp = makeHtmlElement("div", {class: "boxPrefab"});
-    var currentDiv = document.getElementById("app");
-    currentDiv.appendChild(bp);
-    var tt;
-    var ll;
+    let fin = false;
+    let tt;
+    let ll;
     while(!fin)
     {
         tt = Math.floor(Math.random() * 4);
         ll = Math.floor(Math.random() * 4);
-        if(map[tt][ll] == 0) fin = true;
+        if(map[tt*4+ll].holdingNum == 0) fin = true;
     }
-    bpf[bpf.length - 1].style.left = boxLeft[ll]+"px";
-    bpf[bpf.length - 1].style.top = boxTop[tt]+"px";
-    var rr = Math.floor(Math.random() * 10);
+    let bb = bpfPool.pop();
+    bb.style.left = boxLeft[ll]+"px";
+    bb.style.top = boxTop[tt]+"px";
+    let rr = Math.floor(Math.random() * 10);
     if(rr <= 0) rr = 4;
     else rr = 2;
-    bpf[bpf.length - 1].innerHTML = rr;
-    var vv = window["color"+rr];
-    bpf[bpf.length - 1].style.backgroundColor = vv;
-    map[tt][ll] = rr;
-    Enter();
+    bb.innerHTML = rr;
+    let vv = window["color"+rr];
+    bb.style.backgroundColor = vv;
+    map[tt*4+ll].holdingNum = rr;
+    let cd = document.getElementById("app");
+    cd.appendChild(bb);
 
-    document.getElementsByClassName("btn")[0].remove();
-    gameStart = true;
+    document.getElementById("title").remove();
+    gameRun = true;
 }
 
-function GameOver()
+function Left()
 {
-    var over = 0;
-    for(var tt = 0; tt < 4; tt++)
-    {
-        for(var ll = 0; ll < 4; ll++)
-        {
-            if(map[tt][ll] == 0) break;
-            try{
-                if(map[tt][ll] != map[tt-1][ll])
-                {
-                    over++;
-                }
-            }
-            catch(e)
-            {
-                ;
-            }
-            try{
-                if(map[tt][ll] != map[tt+1][ll])
-                {
-                    over++;
-                }
-            }
-            catch(e)
-            {
-                ;
-            }
-            try{
-                if(map[tt][ll] != map[tt][ll-1])
-                {
-                    over++;
-                }
-            }
-            catch(e)
-            {
-                ;
-            }
-            try{
-                if(map[tt][ll] != map[tt][ll+1])
-                {
-                    over++;
-                }
-            }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-            catch(e)
-            {
-                ;
-            }
-        }
-    }
-    if(over >= 56)
-    {
-        console.log("game over");
-        alert("game over");
-    }
+    
 }
