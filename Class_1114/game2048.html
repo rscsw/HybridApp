@@ -6,7 +6,6 @@
     </head>
     <body>
         <script src="https://unpkg.com/vue@3"></script>
-        <script src="script.js"></script>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
             #app{
@@ -19,8 +18,6 @@
                 grid-template-columns : 1fr 1fr 1fr 1fr;
                 grid-template-rows : 1fr 1fr 1fr 1fr;
                 padding: 5px;
-                font-size: 30px;
-                font-family: 'Nanum Pen Script', cursive;
             }
             .numBox{
                 margin : 5px;
@@ -38,6 +35,8 @@
                 left: 20px;
                 top: 20px;
                 color: rgb(255, 255, 255);
+                font-size: 30px;
+                font-family: 'Nanum Pen Script', cursive;
             }
         </style>
         <img src="title.png" id="title" width="310px" height="310px" onclick="GameStart()">
@@ -45,6 +44,7 @@
             <div class="numBox" v-for="index in numBoxes"></div>
         </div>
 
+        <script src="script.js"></script>
         <script>
             const {createApp} = Vue;
             createApp({
@@ -54,6 +54,7 @@
                     }
                 }
             }).mount("#app")
+            document.getElementById("app").style.display = "none";
         </script>
     </body>
 </html>
