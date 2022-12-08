@@ -15,6 +15,11 @@ var color512 = "rgb(255,80,105)";
 var color1024 = "rgb(255,65,90)";
 var color2048 = "rgb(255,50,75)";
 
+var callRedraw = 0;
+var caller = 0;
+
+var score = 0;
+
 const makeHtmlElement = function (tagName, ...attr) {
     const element = document.createElement(tagName);
     for (let prop of attr) {
@@ -59,45 +64,61 @@ class BlockMap
         let clr = window["color"+this.holdingNum];
         box.style.backgroundColor = clr;
     }
-    Animation(movingBox, getMyPos, iGoHere, position)
+    Animation(me, getMyPos, iGoHere, position)
     {
         let myPos = getMyPos;
         if(position == "Left")
         {
             let ii = setInterval(function(){
                 myPos -= 5;
-                movingBox.style.left = myPos+"px";
-                if(myPos == iGoHere) clearInterval(ii);
-            }, 10);
+                me.style.left = myPos+"px";
+                if(myPos == iGoHere)
+                {
+                    callRedraw++;
+                    if(callRedraw == caller) Redraw();
+                    clearInterval(ii);
+                }
+            }, 1);
         }
         else if(position == "Right")
         {
             let ii = setInterval(function(){
                 myPos += 5;
-                movingBox.style.left = myPos+"px";
-                if(myPos == iGoHere) clearInterval(ii);
-            }, 10);
+                me.style.left = myPos+"px";
+                if(myPos == iGoHere)
+                {
+                    callRedraw++;
+                    if(callRedraw == caller) Redraw();
+                    clearInterval(ii);
+                }
+            }, 1);
         }
         else if(position == "Up")
         {
             let ii = setInterval(function(){
                 myPos -= 5;
-                movingBox.style.top = myPos+"px";
-                if(myPos == iGoHere) clearInterval(ii);
-            }, 10);
+                me.style.top = myPos+"px";
+                if(myPos == iGoHere)
+                {
+                    callRedraw++;
+                    if(callRedraw == caller) Redraw();
+                    clearInterval(ii);
+                }
+            }, 1);
         }
         else if(position == "Down")
         {
             let ii = setInterval(function(){
                 myPos += 5;
-                movingBox.style.top = myPos+"px";
-                if(myPos == iGoHere) clearInterval(ii);
-            }, 10);
+                me.style.top = myPos+"px";
+                if(myPos == iGoHere)
+                {
+                    callRedraw++;
+                    if(callRedraw == caller) Redraw();
+                    clearInterval(ii);
+                }
+            }, 1);
         }
-    }
-    MoveLeft()
-    {
-        
     }
 }
 
@@ -116,13 +137,45 @@ function KeyDownEvent(e) {
     {
         switch(e.key)
         {
-            case "ArrowLeft" : MoveLeft(); break;
-            case "ArrowRight" : ; break;
-            case "ArrowUp" : ; break;
-            case "ArrowDown" : drd(); break;
+            case "ArrowLeft" : LeftCommandQueue(); break;
+            case "ArrowRight" : RightCommandQueue(); break;
+            case "ArrowUp" : UpCommandQueue(); break;
+            case "ArrowDown" : DownCommandQueue(); break; 
             default: ;
         }
     }
+}
+
+function LeftCommandQueue()
+{
+    MoveLeft();
+    CallNewBoxPrefab();
+    RecordScore();
+    GameEnd();
+}
+
+function RightCommandQueue()
+{
+    MoveRight();
+    CallNewBoxPrefab();
+    RecordScore();
+    GameEnd();
+}
+
+function UpCommandQueue()
+{
+    MoveUp();
+    CallNewBoxPrefab();
+    RecordScore();
+    GameEnd();
+}
+
+function DownCommandQueue()
+{
+    MoveDown();
+    CallNewBoxPrefab();
+    RecordScore();
+    GameEnd();
 }
 
 function GameStart()
@@ -143,22 +196,39 @@ function GameStart()
     CallNewBoxPrefab();
 
     gameRun = true;
+    score = 0;
+    RecordScore();
 }
 
 function CallNewBoxPrefab()
 {
-    let fin = false;
+    let fin = false; let dnt = false;
     let tt; let ll; let mm;
+    let count = 0;
     while(!fin)
     {
         tt = Math.floor(Math.random() * 4);
         ll = Math.floor(Math.random() * 4);
         mm = tt*4+ll;
         if(map[mm].holdingNum == 0) fin = true;
+        else count++;
+        if(count >= 16)
+        {
+            dnt = true;
+            break;
+        }
     }
-    let bb = bpfPool.pop();
-    map[mm].NewBoxPrefab(bb, tt, ll, 2);
-    UbpfPool.push(bb);
+    if(fin)
+    {
+        let bb = bpfPool.pop();
+        map[mm].NewBoxPrefab(bb, tt, ll, 2);
+        UbpfPool.push(bb);
+        score++;
+    }
+    else if(dnt)
+    {
+        console.log("no more box in the area");
+    }
 }
 
 function MoveLeft()
@@ -172,6 +242,8 @@ function MoveLeft()
             let movingBox;
             let next1 = false;
             let next0 = false;
+            let prePlus = false;
+            let mboxLeft;
             if(map[mm].holdingNum != 0)
             {
                 for(let i = 0; i < UbpfPool.length; i++)
@@ -179,37 +251,60 @@ function MoveLeft()
                     if(UbpfPool[i].style.left == boxLeft[map[mm].myLeft]+"px" && UbpfPool[i].style.top == boxTop[map[mm].myTop]+"px")
                     {
                         movingBox = UbpfPool[i];
+                        mboxLeft = parseInt(movingBox.style.left, 10);
                         break;
                     }
                 }
             }
-            if(map[mm].holdingNum == map[mm-1].holdingNum)
+            if(map[mm].holdingNum == map[mm-1].holdingNum && map[mm].holdingNum != 0)
             {
                 map[mm-1].holdingNum *= 2;
                 map[mm].holdingNum = 0;
                 map[mm-1].myLeft = map[mm].myLeft-1;
                 map[mm-1].myTop = map[mm].myTop;
-                if(ll==1) map[om].Animation(movingBox, boxLeft[map[om].myLeft], boxLeft[map[om-1].myLeft], "Left");
+                if(ll==1)
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-1].myLeft], "Left");
+                    caller++;
+                }
+                else
+                {
+                    prePlus = true;
+                    next1 = true;
+                }
             }
-            else if(map[mm-1].holdingNum == 0)
+            else if(map[mm-1].holdingNum == 0 && map[mm].holdingNum != 0)
             {
                 map[mm-1].holdingNum = map[mm].holdingNum;
                 map[mm].holdingNum = 0;
                 map[mm-1].myLeft = map[mm].myLeft-1;
                 map[mm-1].myTop = map[mm].myTop;
                 if(ll >= 2) next1 = true;
-                else map[om].Animation(movingBox, boxLeft[map[om].myLeft], boxLeft[map[om-1].myLeft], "Left");
+                else
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-1].myLeft], "Left");
+                    caller++;
+                }
             }
             if(next1)
             {
                 mm--;
-                if(map[mm].holdingNum == map[mm-1].holdingNum)
+                if(map[mm].holdingNum == map[mm-1].holdingNum && !prePlus)
                 {
                     map[mm-1].holdingNum *= 2;
                     map[mm].holdingNum = 0;
                     map[mm-1].myLeft = map[mm].myLeft-1;
                     map[mm-1].myTop = map[mm].myTop;
-                    if(ll==2) map[om].Animation(movingBox, boxLeft[map[om].myLeft], boxLeft[map[om-2].myLeft], "Left");
+                    if(ll==2)
+                    {
+                        map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-2].myLeft], "Left");
+                        caller++;
+                    }
+                    else
+                    {
+                        prePlus = true;
+                        next0 = true;
+                    }
                 }
                 else if(map[mm-1].holdingNum == 0)
                 {
@@ -218,19 +313,29 @@ function MoveLeft()
                     map[mm-1].myLeft = map[mm].myLeft-1;
                     map[mm-1].myTop = map[mm].myTop;
                     if(ll >= 3) next0 = true;
-                    else map[om].Animation(movingBox, boxLeft[map[om].myLeft], boxLeft[map[om-2].myLeft], "Left");
+                    else
+                    {
+                        map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-2].myLeft], "Left");
+                        caller++;
+                    }
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-1].myLeft], "Left");
+                    caller++;
                 }
             }
             if(next0)
             {
                 mm--;
-                if(map[mm].holdingNum == map[mm-1].holdingNum)
+                if(map[mm].holdingNum == map[mm-1].holdingNum && !prePlus)
                 {
                     map[mm-1].holdingNum *= 2;
                     map[mm].holdingNum = 0;
                     map[mm-1].myLeft = map[mm].myLeft-1;
                     map[mm-1].myTop = map[mm].myTop;
-                    map[om].Animation(movingBox, boxLeft[map[om].myLeft], boxLeft[map[om-3].myLeft], "Left");
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-3].myLeft], "Left");
+                    caller++;
                 }
                 else if(map[mm-1].holdingNum == 0)
                 {
@@ -238,27 +343,402 @@ function MoveLeft()
                     map[mm].holdingNum = 0;
                     map[mm-1].myLeft = map[mm].myLeft-1;
                     map[mm-1].myTop = map[mm].myTop;
-                    map[om].Animation(movingBox, boxLeft[map[om].myLeft], boxLeft[map[om-3].myLeft], "Left");
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-3].myLeft], "Left");
+                    caller++;
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om-2].myLeft], "Left");
+                    caller++;
                 }
             }
         }
     }
 }
 
-function drd()
+function MoveRight()
 {
-    for(let i = 0; i < 16; i++)
+    for(let tt = 0; tt < 4; tt++)
     {
-        console.log(map[i].holdingNum);
+        for(let ll = 2; ll >= 0; ll--)
+        {
+            let mm = tt*4+ll;
+            let om = mm;
+            let movingBox;
+            let next2 = false;
+            let next3 = false;
+            let prePlus = false;
+            let mboxLeft;
+            if(map[mm].holdingNum != 0)
+            {
+                for(let i = 0; i < UbpfPool.length; i++)
+                {
+                    if(UbpfPool[i].style.left == boxLeft[map[mm].myLeft]+"px" && UbpfPool[i].style.top == boxTop[map[mm].myTop]+"px")
+                    {
+                        movingBox = UbpfPool[i];
+                        mboxLeft = parseInt(movingBox.style.left, 10);
+                        break;
+                    }
+                }
+            }
+            if(map[mm].holdingNum == map[mm+1].holdingNum && map[mm].holdingNum != 0)
+            {
+                map[mm+1].holdingNum *= 2;
+                map[mm].holdingNum = 0;
+                map[mm+1].myLeft = map[mm].myLeft+1;
+                map[mm+1].myTop = map[mm].myTop;
+                if(ll==2)
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+1].myLeft], "Right");
+                    caller++;
+                }
+                else
+                {
+                    prePlus = true;
+                    next2 = true;
+                }
+            }
+            else if(map[mm+1].holdingNum == 0 && map[mm].holdingNum != 0)
+            {
+                map[mm+1].holdingNum = map[mm].holdingNum;
+                map[mm].holdingNum = 0;
+                map[mm+1].myLeft = map[mm].myLeft+1;
+                map[mm+1].myTop = map[mm].myTop;
+                if(ll <= 1) next2 = true;
+                else
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+1].myLeft], "Right");
+                    caller++;
+                }
+            }
+            if(next2)
+            {
+                mm++;
+                if(map[mm].holdingNum == map[mm+1].holdingNum && !prePlus)
+                {
+                    map[mm+1].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm+1].myLeft = map[mm].myLeft+1;
+                    map[mm+1].myTop = map[mm].myTop;
+                    if(ll==1)
+                    {
+                        map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+2].myLeft], "Right");
+                        caller++;
+                    }
+                    else
+                    {
+                        prePlus = true;
+                        next3 = true;
+                    }
+                }
+                else if(map[mm+1].holdingNum == 0)
+                {
+                    map[mm+1].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm+1].myLeft = map[mm].myLeft+1;
+                    map[mm+1].myTop = map[mm].myTop;
+                    if(ll <= 0) next3 = true;
+                    else
+                    {
+                        map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+2].myLeft], "Right");
+                        caller++;
+                    }
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+1].myLeft], "Right");
+                    caller++;
+                }
+            }
+            if(next3)
+            {
+                mm++;
+                if(map[mm].holdingNum == map[mm+1].holdingNum && !prePlus)
+                {
+                    map[mm+1].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm+1].myLeft = map[mm].myLeft+1;
+                    map[mm+1].myTop = map[mm].myTop;
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+3].myLeft], "Right");
+                    caller++;
+                }
+                else if(map[mm+1].holdingNum == 0)
+                {
+                    map[mm+1].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm+1].myLeft = map[mm].myLeft+1;
+                    map[mm+1].myTop = map[mm].myTop;
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+3].myLeft], "Right");
+                    caller++;
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxLeft, boxLeft[map[om+2].myLeft], "Right");
+                    caller++;
+                }
+            }
+        }
     }
+}
 
+function MoveUp()
+{
+    for(let ll = 0; ll < 4; ll++)
+    {
+        for(let tt = 1; tt < 4; tt++)
+        {
+            let mm = tt*4+ll;
+            let om = mm;
+            let movingBox;
+            let next1 = false;
+            let next0 = false;
+            let prePlus = false;
+            let mboxTop;
+            if(map[mm].holdingNum != 0)
+            {
+                for(let i = 0; i < UbpfPool.length; i++)
+                {
+                    if(UbpfPool[i].style.left == boxTop[map[mm].myLeft]+"px" && UbpfPool[i].style.top == boxTop[map[mm].myTop]+"px")
+                    {
+                        movingBox = UbpfPool[i];
+                        mboxTop = parseInt(movingBox.style.top, 10);
+                        break;
+                    }
+                }
+            }
+            if(map[mm].holdingNum == map[mm-4].holdingNum && map[mm].holdingNum != 0)
+            {
+                map[mm-4].holdingNum *= 2;
+                map[mm].holdingNum = 0;
+                map[mm-4].myLeft = map[mm].myLeft;
+                map[mm-4].myTop = map[mm].myTop-1;
+                if(tt==1)
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om-4].myTop], "Up");
+                    caller++;
+                }
+                else
+                {
+                    prePlus = true;
+                    next1 = true;
+                }
+            }
+            else if(map[mm-4].holdingNum == 0 && map[mm].holdingNum != 0)
+            {
+                map[mm-4].holdingNum = map[mm].holdingNum;
+                map[mm].holdingNum = 0;
+                map[mm-4].myLeft = map[mm].myLeft;
+                map[mm-4].myTop = map[mm].myTop-1;
+                if(tt >= 2) next1 = true;
+                else
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om-4].myTop], "Up");
+                    caller++;
+                }
+            }
+            if(next1)
+            {
+                mm -= 4;
+                if(map[mm].holdingNum == map[mm-4].holdingNum && !prePlus)
+                {
+                    map[mm-4].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm-4].myLeft = map[mm].myLeft;
+                    map[mm-4].myTop = map[mm].myTop-1;
+                    if(tt==2)
+                    {
+                        map[om].Animation(movingBox, mboxTop, boxTop[map[om-8].myTop], "Up");
+                        caller++;
+                    }
+                    else
+                    {
+                        prePlus = true;
+                        next0 = true;
+                    }
+                }
+                else if(map[mm-4].holdingNum == 0)
+                {
+                    map[mm-4].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm-4].myLeft = map[mm].myLeft;
+                    map[mm-4].myTop = map[mm].myTop-1;
+                    if(tt >= 3) next0 = true;
+                    else
+                    {
+                        map[om].Animation(movingBox, mboxTop, boxTop[map[om-8].myTop], "Up");
+                        caller++;
+                    }
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om-4].myTop], "Up");
+                    caller++;
+                }
+            }
+            if(next0)
+            {
+                mm -= 4;
+                if(map[mm].holdingNum == map[mm-4].holdingNum && !prePlus)
+                {
+                    map[mm-4].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm-4].myLeft = map[mm].myLeft;
+                    map[mm-4].myTop = map[mm].myTop-1;
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om-12].myTop], "Up");
+                    caller++;
+                }
+                else if(map[mm-4].holdingNum == 0)
+                {
+                    map[mm-4].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm-4].myLeft = map[mm].myLeft;
+                    map[mm-4].myTop = map[mm].myTop-1;
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om-12].myTop], "Up");
+                    caller++;
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om-8].myTop], "Up");
+                    caller++;
+                }
+            }
+        }
+    }
+}
+
+function MoveDown()
+{
+    for(let ll = 0; ll < 4; ll++)
+    {
+        for(let tt = 2; tt >= 0; tt--)
+        {
+            let mm = tt*4+ll;
+            let om = mm;
+            let movingBox;
+            let next2 = false;
+            let next3 = false;
+            let prePlus = false;
+            let mboxTop;
+            if(map[mm].holdingNum != 0)
+            {
+                for(let i = 0; i < UbpfPool.length; i++)
+                {
+                    if(UbpfPool[i].style.left == boxTop[map[mm].myLeft]+"px" && UbpfPool[i].style.top == boxTop[map[mm].myTop]+"px")
+                    {
+                        movingBox = UbpfPool[i];
+                        mboxTop = parseInt(movingBox.style.top, 10);
+                        break;
+                    }
+                }
+            }
+            if(map[mm].holdingNum == map[mm+4].holdingNum && map[mm].holdingNum != 0)
+            {
+                map[mm+4].holdingNum *= 2;
+                map[mm].holdingNum = 0;
+                map[mm+4].myLeft = map[mm].myLeft;
+                map[mm+4].myTop = map[mm].myTop+1;
+                if(tt==2)
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om+4].myTop], "Down");
+                    caller++;
+                }
+                else
+                {
+                    prePlus = true;
+                    next2 = true;
+                }
+            }
+            else if(map[mm+4].holdingNum == 0 && map[mm].holdingNum != 0)
+            {
+                map[mm+4].holdingNum = map[mm].holdingNum;
+                map[mm].holdingNum = 0;
+                map[mm+4].myLeft = map[mm].myLeft;
+                map[mm+4].myTop = map[mm].myTop+1;
+                if(tt <= 1) next2 = true;
+                else
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om+4].myTop], "Down");
+                    caller++;
+                }
+            }
+            if(next2)
+            {
+                mm += 4;
+                if(map[mm].holdingNum == map[mm+4].holdingNum && !prePlus)
+                {
+                    map[mm+4].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm+4].myLeft = map[mm].myLeft;
+                    map[mm+4].myTop = map[mm].myTop+1;
+                    if(tt==1)
+                    {
+                        map[om].Animation(movingBox, mboxTop, boxTop[map[om+8].myTop], "Down");
+                        caller++;
+                    }
+                    else
+                    {
+                        prePlus = true;
+                        next3 = true;
+                    }
+                }
+                else if(map[mm+4].holdingNum == 0)
+                {
+                    map[mm+4].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm+4].myLeft = map[mm].myLeft;
+                    map[mm+4].myTop = map[mm].myTop+1;
+                    if(tt <= 0) next3 = true;
+                    else
+                    {
+                        map[om].Animation(movingBox, mboxTop, boxTop[map[om+8].myTop], "Down");
+                        caller++;
+                    }
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om+4].myTop], "Down");
+                    caller++;
+                }
+            }
+            if(next3)
+            {
+                mm += 4;
+                if(map[mm].holdingNum == map[mm+4].holdingNum && !prePlus)
+                {
+                    map[mm+4].holdingNum *= 2;
+                    map[mm].holdingNum = 0;
+                    map[mm+4].myLeft = map[mm].myLeft;
+                    map[mm+4].myTop = map[mm].myTop+1;
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om+12].myTop], "Down");
+                    caller++;
+                }
+                else if(map[mm+4].holdingNum == 0)
+                {
+                    map[mm+4].holdingNum = map[mm].holdingNum;
+                    map[mm].holdingNum = 0;
+                    map[mm+4].myLeft = map[mm].myLeft;
+                    map[mm+4].myTop = map[mm].myTop+1;
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om+12].myTop], "Down");
+                    caller++;
+                }
+                else
+                {
+                    map[om].Animation(movingBox, mboxTop, boxTop[map[om+8].myTop], "Down");
+                    caller++;
+                }
+            }
+        }
+    }
+}
+
+function Redraw()
+{
     let ul = UbpfPool.length;
     for(let i = 0; i < ul; i++)
     {
         let bb = UbpfPool.pop();
         bb.style.display = "none";
         bpfPool.push(bb);
-        console.log("attention");
     }
 
     for(let tt = 0; tt < 4; tt++)
@@ -272,6 +752,81 @@ function drd()
                 map[mm].NewBoxPrefab(bb, tt, ll, map[mm].holdingNum);
                 UbpfPool.push(bb);
             }
+            if(map[mm].holdingNum == 2) score+=1;
+            if(map[mm].holdingNum == 4) score+=1;
+            if(map[mm].holdingNum == 8) score+=1;
+            if(map[mm].holdingNum == 16) score+=1;
+            if(map[mm].holdingNum == 32) score+=1;
+            if(map[mm].holdingNum == 64) score+=1;
+            if(map[mm].holdingNum == 128) score+=2;
+            if(map[mm].holdingNum == 256) score+=10;
+            if(map[mm].holdingNum == 512) score+=20;
+            if(map[mm].holdingNum == 1024) score+=50;
+            if(map[mm].holdingNum == 2048) score+=1000;
         }
     }
+
+    callRedraw = 0;
+    caller = 0;
+}
+
+function GameEnd()
+{
+    let over = 0;
+    let win = false;
+    for(let i = 0; i < 16; i++)
+    {
+        if(map[i].holdingNum == 0) break;
+        else if(map[i].holdingNum == 2048) {win = true; break;}
+        try {
+            if(map[i].holdingNum != map[i-1].holdingNum)
+            {
+                over++;
+            }
+        } catch(e) {;}
+        try {
+            if(map[i].holdingNum != map[i+1].holdingNum)
+            {
+                over++;
+            }
+        } catch(e) {;}
+        try {
+            if(map[i].holdingNum != map[i-4].holdingNum)
+            {
+                over++;
+            }
+        } catch(e) {;}
+        try {
+            if(map[i].holdingNum != map[i+4].holdingNum)
+            {
+                over++;
+            }
+        } catch(e) {;}
+    }
+        
+    if(over >= 54)
+    {
+        document.getElementById("app").style.display = "none";
+        document.getElementById("win").remove();
+        document.getElementById("over").style.width = "310px";
+        document.getElementById("over").style.height = "310px";
+        for(let i = 0; i < UbpfPool.length; i++) UbpfPool[i].remove();
+        for(let i = 0; i < bpfPool.length; i++) bpfPool[i].remove();
+        gameRun = false;
+    }
+    else if(win)
+    {
+        document.getElementById("app").style.display = "none";
+        document.getElementById("over").remove();
+        document.getElementById("win").style.width = "310px";
+        document.getElementById("win").style.height = "310px";
+        for(let i = 0; i < UbpfPool.length; i++) UbpfPool[i].remove();
+        for(let i = 0; i < bpfPool.length; i++) bpfPool[i].remove();
+        gameRun = false;
+    }
+}
+
+function RecordScore()
+{
+    document.getElementById("scoretext").innerText = "\u00a0\u00a0\u00a0your score : "+score;
 }

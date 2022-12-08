@@ -38,11 +38,19 @@
                 font-size: 30px;
                 font-family: 'Nanum Pen Script', cursive;
             }
+            h1{
+                font-size : 40px;
+                font-family : 'Nanum Pen Script', cursive;
+                color : rgb(255, 0, 157);
+            }
         </style>
         <img src="title.png" id="title" width="310px" height="310px" onclick="GameStart()">
         <div id="app">
             <div class="numBox" v-for="index in numBoxes"></div>
         </div>
+        <h1 id="scoretext"></h1>
+        <img src="over.png" id="over" width="0px" height="0px">
+        <img src="win.png" id="win" width="0px" height="0px">
 
         <script src="script.js"></script>
         <script>
